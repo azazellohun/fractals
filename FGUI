@@ -1,0 +1,61 @@
+#%%
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Oct 24 18:37:41 2017
+
+@author: LGergo
+"""
+
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+from numpy import sin,cos,sinh,cosh,sqrt,vstack,hstack,zeros,eye
+
+import tkinter as Tk
+from tkinter.messagebox import *
+matplotlib.use('TkAgg')
+
+def map_to_grid(x, grid_res):
+    wholes = x // grid_res
+    remainder = x - wholes * grid_res
+    if grid_res/2 > remainder:
+        return wholes * grid_res
+    else:
+        return (wholes+1) * grid_res
+
+class FGUI:
+    
+    def __init__(self):
+        self.root = Tk.Tk()
+        self.root.wm_title("Iteration definition")
+        
+        self.A, self.B = [0,0], [1,0]
+        
+        self.fig = plt.figure()
+        self.ax = self.fig.add_subplot(1, 1, 1)
+        self.ax.set_xlim([0, 1])
+        self.ax.set_ylim([-0.5, 0.5])
+        self.ax.grid(which='major', alpha=0.05)
+        
+        self.points_x, self.points_y = list(list(zip(self.A, self.B))[0]), list(list(zip(self.A, self.B))[1])
+        
+        self.line = self.ax.plot(self.points_x, self.points_y, color='k')
+        
+                
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
+        self.canvas.mpl_connect('button_press_event', self.button_press)
+        self.canvas.show()
+        self.canvas.get_tk_widget().pack(side=Tk.TOP, fill=Tk.BOTH, expand=1)
+        
+        Tk.mainloop()
+        
+    def button_press(self, event):
+        self.ax.lines.remove(self.line[0])
+        
+        self.points_x[-1:-1], self.points_y[-1:-1] = [map_to_grid(float(event.xdata), 0.05)], [map_to_grid(float(event.ydata), 0.05)]
+        
+        self.line = self.ax.plot(self.points_x, self.points_y, color='k', marker ="o")
+        
+        self.canvas.draw()
+
+f = FGUI()
