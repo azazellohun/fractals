@@ -6,30 +6,61 @@ from math import sin, cos, pi
 # loopCount = 10
 # print ('number of points: ' + str(2^[2*(loopCount-1)]+1))
 
-# class Fractal:
-#     def __init__(self, x0, y0, x1, y1):
-#         self.points_x = [x0, x1]
-#         self.points_y = [y0, y1]
-#         self.pointCount = 2
-#         self.iter_number = 0
-#
-#
-#     # def draw(self):
-#     #     self.fig = plt.figure(self.iter_number)
-#     #     self.ax = self.fig.add_subplot(1, 1, 1)
-#     #     self.ax.plot(self.points_x, self.points_y, color='k')
-#     #     self.ax.set_xlim([0, 1])
-#     #     self.ax.set_ylim([-0.4, 0.6])
-#     #     plt.show()
-#     #     # print("N = {}".format())
-#     def iterate(self, N):
-#         self.iter_number += N
-#         for i in range(N):
-#             for j in range(len(self.points_x - 1)):
-#
-#     def iteration_spet(self):
-#         self.pointCount += 3
-#
+import matplotlib.pyplot as plt
+import numpy as np
+from numpy import sin,cos,sinh,cosh,sqrt,vstack,hstack,zeros,eye, pi
+from copy import deepcopy
+
+def Rot(fi):
+    return np.array([[cos(fi), sin(fi)],[-sin(fi), cos(fi)]])
+
+class Fractal:
+           
+    def __init__(self, x0=0, y0=0, x1=1, y1=0):
+        self.points_x = [x0, x1]
+        self.points_y = [y0, y1]
+        self.point_count = 2 
+        self.iter_number = 0
+        
+    def draw(self):
+        self.fig = plt.figure(figsize=(8, 8))
+        self.ax = self.fig.add_subplot(1, 1, 1)        
+        self.ax.plot(self.points_x, self.points_y, color='k')
+        self.ax.set_xlim([0, 1])
+        self.ax.set_ylim([-0.4, 0.6])
+        plt.show()
+
+        print("N = {}".format(self.iter_number))
+        
+    def iterate(self, N):
+        self.iter_number += N
+        
+        for i in range(N):            
+            copy_x, copy_y = deepcopy(self.points_x), deepcopy(self.points_y)
+            for j in range(len(copy_x)- 1): 
+                new_x, new_y = self.iteration_spet([copy_x[j], copy_y[j]], [copy_x[j+1], copy_y[j+1]])
+                self.points_x[j*(3)+j+1 : j*(3)+j+1] = new_x
+                self.points_y[j*(3)+j+1 : j*(3)+j+1] = new_y
+     
+    def iteration_spet(self, A, B):
+        self.point_count += 3
+        x0,y0,x1,y1 = *A, *B
+        
+        AB_3rd = np.array([x1-x0, y1-y0]) / 3
+        E = np.array(A) + AB_3rd
+        F = E + np.dot(Rot(-pi/3), AB_3rd) 
+        G = B - AB_3rd
+        F = G - np.dot(Rot(pi/3), AB_3rd) 
+        
+        x_insert, y_insert = zip(E, F, G)
+         
+        return x_insert, y_insert
+           
+
+frac = Fractal()
+
+frac.iterate(1)
+frac.draw()
 
 
 def pointMaker(A, B, fi):
